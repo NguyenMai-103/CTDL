@@ -1,0 +1,33 @@
+
+use northwind;
+/*BTH2: 1*/
+select * from Customers, Orders
+where Customers.CustomerID=Orders.CustomerID;
+/*BTH2: 2*/
+select CustomerID, CompanyName, [ContactName],[Address] from [dbo].[Customers]
+where City='London' or Country='france';
+/*BTH2: 3*/
+select CustomerID, CompanyName, [ContactName],[Address],[ContactTitle] from [dbo].[Customers]
+where ([ContactTitle]='Sales Manager' and [Country]='USA') OR ([ContactTitle]='Owner' and [Country]='Mexico');
+/*BTH2: 4*/
+select CustomerID, CompanyName, [ContactName],[Address],[ContactTitle] from [dbo].[Customers]
+where ([ContactTitle]='Manager' and [Country]='USA') OR not([ContactTitle]='Owner' and [Country]='Mexico');
+/*BTH2: 5*/
+select [OrderID],[OrderDate], CompanyName, LastName
+from Orders, Customers,Employees
+where Orders.CustomerID=Customers.CustomerID and Orders.EmployeeID=Employees.EmployeeID and Month(OrderDate)<=6 and Year(OrderDate)=1997;
+/*BTH2: 6*/
+SELECT [OrderID],[OrderDate],[CustomerID],[EmployeeID] FROM Orders
+where Month([OrderDate])=2 and year([OrderDate])=1997;
+/*BTH2: 7*/
+select [OrderID],[OrderDate],[Freight] from [dbo].[Orders]
+where [ShipCountry]='UK' AND [EmployeeID]=2 and year(OrderDate)=1997;
+/*BTH2: 8*/
+select [ProductID], [ProductName] from Products
+where Productname like 'Ch%';
+/*BTH2: 9*/
+select [ProductID],[UnitPrice],[UnitsInStock] from [dbo].[Products]
+where ([Discontinued]=1) and ([UnitsInStock]>0);
+/*BTH2: 10*/
+select [CompanyName],[ContactName],[Country],[Phone],[Fax] from [dbo].[Customers]
+where Country!='USA';
