@@ -1,33 +1,219 @@
+USE NORTHWND;
+/*1.	Viết tích Đề-các giữa 2 bảng Customers và Orders, nhận xét số hàng kết quả. 
+Thêm điều kiện kết, nhận xét số hàng kết quả. */
+SELECT *FROM Customers, Orders
+where Customers.CustomerID=Orders.CustomerID; --830 column
 
-use northwind;
-/*BTH2: 1*/
-select * from Customers, Orders
-where Customers.CustomerID=Orders.CustomerID;
-/*BTH2: 2*/
-select CustomerID, CompanyName, [ContactName],[Address] from [dbo].[Customers]
-where City='London' or Country='france';
-/*BTH2: 3*/
-select CustomerID, CompanyName, [ContactName],[Address],[ContactTitle] from [dbo].[Customers]
-where ([ContactTitle]='Sales Manager' and [Country]='USA') OR ([ContactTitle]='Owner' and [Country]='Mexico');
-/*BTH2: 4*/
-select CustomerID, CompanyName, [ContactName],[Address],[ContactTitle] from [dbo].[Customers]
-where ([ContactTitle]='Manager' and [Country]='USA') OR not([ContactTitle]='Owner' and [Country]='Mexico');
-/*BTH2: 5*/
-select [OrderID],[OrderDate], CompanyName, LastName
-from Orders, Customers,Employees
-where Orders.CustomerID=Customers.CustomerID and Orders.EmployeeID=Employees.EmployeeID and Month(OrderDate)<=6 and Year(OrderDate)=1997;
-/*BTH2: 6*/
-SELECT [OrderID],[OrderDate],[CustomerID],[EmployeeID] FROM Orders
-where Month([OrderDate])=2 and year([OrderDate])=1997;
-/*BTH2: 7*/
-select [OrderID],[OrderDate],[Freight] from [dbo].[Orders]
-where [ShipCountry]='UK' AND [EmployeeID]=2 and year(OrderDate)=1997;
-/*BTH2: 8*/
-select [ProductID], [ProductName] from Products
-where Productname like 'Ch%';
-/*BTH2: 9*/
+
+/*2.	Lập danh sách các Customer ở thành phố London hoặc ở nước Pháp (France). 
+Danh sách gồm: Customer ID, Company Name, Contact Name, Address, City */
+select [CustomerID],[CompanyName],[ContactName],[Address],[City] from Customers
+where City='London' or Country='France'; --17 column
+
+
+/*3.	Lập danh sách các Customer là Sales Manager của nước Mỹ (USA) hoặc là Owner của Mexico. 
+Danh sách gồm như trên, thêm cột Contact Title */
+select * from Customers;
+select [CustomerID],[CompanyName],[ContactName],[Address],[City], [ContactTitle] from Customers
+where (ContactTitle='Sales Manager' and Country ='USA') or (ContactTitle='Owner' and Country ='Mexico'); --5
+
+
+/*4.	Lập danh sách các Customer là Manager của nước Mỹ (USA) hoặc: không phải là Owner của Mexico. 
+Danh sách gồm các fields như trên */
+select * from Customers;
+select [CustomerID],[CompanyName],[ContactName],[Address],[City], [ContactTitle] from Customers
+where (ContactTitle='Manager' and Country ='USA') or not (ContactTitle='Owner' and Country ='Mexico'); --88
+
+
+/*5.	Lập danh sách các Order có ngày đặt hàng trong 6 tháng đầu năm 1997. Danh sách gồm: Order ID, Order Date, Customer, Employee 
+trong đó Customer là Company Name của khách hàng, Employee lấy Last Name */
+select [OrderID],[OrderDate],[CompanyName],[LastName] from Customers, Employees, Orders
+where (Customers.CustomerID=Orders.CustomerID) and (Employees.EmployeeID=Orders.EmployeeID) and (month(OrderDate)<=6 and year(OrderDate)=1997); --185;
+
+
+/*6.	Lập danh sách các Order có ngày đặt hàng trong tháng 2 năm 1997.
+Danh sách gồm: Order ID, Order Date, CustomerID, EmployeeID.*/
+select [OrderID],[OrderDate],[CustomerID],[EmployeeID] from [dbo].[Orders]
+where month(OrderDate)=2 and year(OrderDate)=1997; --29
+
+
+/*7.	Danh sách các Order có Ship Country là UK do nhân viên có mã là 2 phụ trách trong năm 1997.
+Danh sách gồm:   Order ID, Order Date, Freight */
+Select [OrderID],[OrderDate],[Freight] from Orders 
+where [ShipCountry]='UK' and [EmployeeID]=2 and year([OrderDate])=1997;
+
+/*8.	Người ta muốn biết danh sách các sản phẩm có tên bắt đầu là Ch. 
+Anh chi hãy lập danh sách này, gồm các cột: Product ID, Product Name.*/
+select [ProductID],[ProductName] from Products
+where [ProductName] like 'Ch%'; --6
+
+/*9.	Lập danh sách các sản phẩm không còn tiếp tục cung cấp nữa (trường Discontinued) và 
+có số lượng tồn kho (trường Unit In stock) lớn hơn không. 
+Danh sách gồm: Product ID, Unit Price, Unit In Stock.*/
+select * from [dbo].[Products];
 select [ProductID],[UnitPrice],[UnitsInStock] from [dbo].[Products]
-where ([Discontinued]=1) and ([UnitsInStock]>0);
-/*BTH2: 10*/
+where [Discontinued]=1 and [UnitsInStock]>0;--4
+
+
+/*10.	Lập danh sách các khách hàng không thuộc nước Mỹ. Danh sách gồm: 
+Company Name, Contact Name, Country, Phone, Fax */
 select [CompanyName],[ContactName],[Country],[Phone],[Fax] from [dbo].[Customers]
-where Country!='USA';
+where [Country]!='USA'; --78
+
+
+/*11.	Lập danh sách các khách hàng không thuộc các nước Brazil, Italy, Spain, Venezuela và UK.
+Danh sách gồm: Company Name, Contact Name, Country, Phone, Fax */
+select [CompanyName],[ContactName],[Country],[Phone],[Fax] from [dbo].[Customers]
+where [Country] not in ('Brazil','Italy','Spain','Venezuela','UK'); --63
+
+
+/*12.	Lập danh sách các đơn đặt hàng có Ship country là USA và có Freight > 300 hoặc 
+các đơn có Ship Country là Argentina và Freight <5. Danh sách gồm:
+Order ID, Customer, Employee, Order date, Ship Country, Ship date, Freight */
+select [OrderID],[CustomerID],[EmployeeID],[OrderDate],[ShipCountry],[ShippedDate],[Freight] from [dbo].[Orders]
+where ([ShipCountry]='USA' and [Freight]>300) or ([ShipCountry]='Argentina' and [Freight]<5); --16
+
+
+/*13.	Lập danh sách các đơn đặt hàng có Ship country là USA và có Freight > 300 
+hoặc các đơn có Ship Country là Argentina và Freight <5. Danh sách gồm: 
+Order ID, Customer, Employee, Order date, Ship Country, Ship date, Freight */
+
+/*14.	Lập danh sách các đơn hàng trong tháng 4/97 gồm các thông tin sau:
+Order ID, Order Date, Customer, Employee, Freight, New-Freight 
+trong đó New-Freight =110% Freight. */
+select [OrderID],
+	[OrderDate],
+	[CustomerID] as Customer,
+	[EmployeeID] as Employee,
+	[Freight],
+	FORMAT(ROUND([Freight]*1.1,1),'N2') as NewFreight -- FROMAT: giam so thap phan duoi, round: lam tron so thap phan
+from [dbo].[Orders]
+where month(OrderDate)=4 and year([OrderDate])=1997; --31
+
+
+/*15.	Lập danh sách trị giá tồn kho các Product không còn tiếp tục cung cấp nữa (trường 
+Discontinued là Yes). Danh sách gồm: Product ID, Product Name, Supplier Name, 
+UnitPrice, 	UintsInStock, 	Total, 	Supplier 	Fax, 	trong 	đó 	Total 	= UnitPrice*UnitsInStock 
+*/
+Select [ProductID],
+	[ProductName],
+	Suppliers.[SupplierID] as SupplierName,
+	[UnitPrice],
+	[UnitsInStock],
+	[UnitPrice]*[UnitsInStock] as Total,
+	[Suppliers].[Fax] as SupplierFax 
+from Products, Suppliers
+where [Discontinued]=1 and Products.[SupplierID]=[Suppliers].[SupplierID]; --8;
+
+
+/*16.	Lập danh sách nhân viên (Table Employee) có hire date từ năm 1993 trở về trước.
+Danh sách gồm: Name, Hire date, Title, BirthDate, Home Phone, trong đó 
+trường Name ghép từ các trường: TitleOfCourstesy, chữ đầu trường LastName và trường FirstName */
+Select CONCAT([TitleOfCourtesy],left([LastName],1), [FirstName]) as 'Name',
+	[HireDate],
+	[Title],
+	[BirthDate],
+	[HomePhone]
+from [dbo].[Employees]
+where year([HireDate]) <=1993; --6
+
+
+/*17.	Lập danh sách các Order có ngày đặt hàng trong tháng 4 hàng năm. 
+Danh sách gồm: Order ID, Order Date, Customer, Employee trong đó Customer là Company Name của khách hàng, Employee lấy Last Name */
+select [OrderID], [OrderDate],
+	[CustomerID] as Customer,
+	[EmployeeID] as Employee
+from Orders
+where month([OrderDate])=4;--105
+/*18.	Lập danh sách các Order có ngày đặt hàng các năm chẳn. Danh sách gồm: Order ID, Order Date, Customer, Employee 
+trong đó Customer là Company Name của khách hàng, Employee lấy Last Name */
+select [OrderID],[OrderDate],
+	[CompanyName] as Customer,
+	[LastName] as Employee
+from [dbo].[Employees],[dbo].[Customers],[dbo].[Orders]
+where (Employees.EmployeeID=Orders.EmployeeID)and(Customers.CustomerID=Orders.CustomerID)and year([OrderDate])%2=0; --422
+/*19.	Lập danh sách các Order có ngày đặt hàng là 5, 13, 14, 23.
+Danh sách gồm: Order ID, Order Date, Customer, Employee 
+trong đó Customer là Company Name của khách hàng, Employee lấy Last Name */
+select [OrderID],[OrderDate],
+	[CompanyName] as Customer,
+	[LastName] as Employee
+from [dbo].[Employees],[dbo].[Customers],[dbo].[Orders]
+where  (Employees.EmployeeID=Orders.EmployeeID)and(Customers.CustomerID=Orders.CustomerID)and day([OrderDate]) in (5,13,14,23);
+--111
+
+/*20.	Người ta muốn có danh sách chi tiết các hoá đơn (Order Details) trong năm 1997. 
+Danh sách gồm các thông tin: Order ID, ProductName, Unit Price, Quantity, ThanhTien, Discount, TienGiamGia, TienPhaiTra 
+trong đó: ThanhTien = UnitPrice*Quantity, TienGiamGia = ThanhTien *Discount, TienPhaiTra = ThanhTien – TienGiamGia */
+select * from [dbo].[Order Details];
+select [dbo].[Order Details].[OrderID],[ProductName],[dbo].[Order Details].[UnitPrice],[Quantity],
+	[dbo].[Order Details].[UnitPrice]*[Quantity] as ThanhTien,
+	[Discount],
+	([dbo].[Order Details].[UnitPrice]*[Quantity])*[Discount] as TienGiamGia,
+	([dbo].[Order Details].[UnitPrice]*[Quantity]) - (([dbo].[Order Details].[UnitPrice]*[Quantity])*[Discount]) as TienPhaiTra
+from [dbo].[Order Details],[dbo].[Products],Orders
+where [dbo].[Order Details].ProductID=[dbo].[Products].[ProductID] and 
+	[dbo].[Order Details].OrderID=Orders.OrderID and 
+	[dbo].[Order Details].ProductID=Products.ProductID and 
+	year(Orders.OrderDate)=1997; --1059
+
+
+/*21.	Tương tự như câu 20 nhưng chỉ lấy các record có Discount >0 và có TienPhaiTra <50 */--59
+select * from [dbo].[Order Details];
+select [dbo].[Order Details].[OrderID],[ProductName],[dbo].[Order Details].[UnitPrice],[Quantity],
+	[dbo].[Order Details].[UnitPrice]*[Quantity] as ThanhTien,
+	[Discount],
+	([dbo].[Order Details].[UnitPrice]*[Quantity])*[Discount] as TienGiamGia,
+	([dbo].[Order Details].[UnitPrice]*[Quantity]) - (([dbo].[Order Details].[UnitPrice]*[Quantity])*[Discount]) as TienPhaiTra
+from [dbo].[Order Details],[dbo].[Products],Orders
+where [dbo].[Order Details].ProductID=[dbo].[Products].[ProductID] and 
+	[dbo].[Order Details].OrderID=Orders.OrderID and 
+	[dbo].[Order Details].ProductID=Products.ProductID and Discount>0 and ([dbo].[Order Details].[UnitPrice]*[Quantity]) - (([dbo].[Order Details].[UnitPrice]*[Quantity])*[Discount])<50;
+/*22.	Từ Table Product, đếm số sản phẩm, đơn giá cao nhất, thấp nhất và đơn giá trung bình cuả tất cả sản phẩm */
+select * from products;
+select 
+	count(ProductID) as SoSanPham,--77
+	MAX([UnitPrice]) as DonGiaCaoNhat, --263.50
+	MIN([UnitPrice]) as DonGiaThapNhat,--2.50
+	AVG([UnitPrice]) as DonGiaTrungBinh--28.8663
+from [dbo].[Products];
+/*23.	Như câu 22 nhưng được nhóm theo loại sản phẩm (Category ID) */
+select 
+	count(ProductID) as SoSanPham,--77
+	MAX([UnitPrice]) as DonGiaCaoNhat, --263.50
+	MIN([UnitPrice]) as DonGiaThapNhat,--2.50
+	AVG([UnitPrice]) as DonGiaTrungBinh--28.8663
+from [dbo].[Products]
+group by [CategoryID];--8
+/*24.	Đếm số đơn đặt hàng cuả các Order có Ship Country là Belgium, Canada, UK */ --105
+select * from Orders;
+select count(OrderID)
+from [dbo].[Orders]
+where [dbo].[Orders].[ShipCountry] in ('Belgium','Canada','UK'); --105
+/*25.	Lập danh sách các loại sản phẩm có đơn giá trung bình lớn hơn 30 */
+select avg([UnitPrice]) from [dbo].[Products]
+where [UnitPrice]>30
+group by [CategoryID];
+/*26.	Tính đơn giá trung bình cuả các sản phẩm có đơn giá lớn hơn 30, nhóm theo loại sản phẩm */
+/*27.	Thiết kế query tính doanh số của từng loại sản phẩm (Category) trong năm 1996.
+Danh sách gồm 2 cột: Category Name, Sales; 
+trong đó SalesTotal = UnitPrice*Quantity*(1-Discount) */
+/*28.	Thiết kế query tính tỉ lệ tiền cước mua hàng (Freight) của từng khách hàng trong năm 1997. 
+Danh sách gồm các cột: Company Name (của Customer), Freight, SalesTotal = UnitPrice * Quantity*(1-Discount), Percent= Freight/SalesTotal */
+/*29.	Lập danh sách Customer có Company Name bắt đầu là 1 chữ nào đó được nhập từ bàn phím. 
+Danh sách gồm: Customer ID, CompanyName, ContactName, Address, City, Country, Phone, Fax */
+/*30.	Lập danh sách các Order có Order Date trong 1 khoảng thời gian nào đó. 
+Tham số nhập: “From date:” và “To:”. Danh sách gồm: Order ID, Customer, ShipCountry, OrderDate */
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+
