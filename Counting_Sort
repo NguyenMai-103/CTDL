@@ -1,0 +1,59 @@
+#include<iostream>
+using namespace std;
+#define MAX 100
+void nhapMang(int a[], int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		cout << "a[" << i << "]= ";
+		cin >> a[i];
+		cout << endl;
+	}
+}
+void xuatMang(int a[], int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		cout << a[i] << " ";
+	}
+}
+//find max element
+int Max(int a[], int n)
+{
+	int M = a[0];
+	for (int i = 1; i < n; i++)
+	{
+		if (M < a[i])
+		{
+			M = a[i];
+		}
+	}
+	return M;
+}
+void Countinf_Sort(int a[], int n)
+{	int maxElement= Max(a, n)+1;
+
+	//create countA with length arr = Max_element+1
+	int countArr[MAX];
+	for (int i = 0; i <=maxElement; i++)
+	{
+		// gan tat ca cac element trong countArr = 0
+		countArr[i] = 0;
+	}
+}
+
+int main()
+{
+	int a[MAX];
+	int n;
+	do {
+		cout << "Nhap so luong phan tu trong mang: ";
+		cin >> n;
+		if (n > MAX || n < 0)
+		{
+			cout << "So luong phan tu khong hop le" << endl;
+		}
+
+	} while (n > MAX || n < 0);
+	return 0;
+}
