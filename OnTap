@@ -1,0 +1,405 @@
+//1. Tạo file ma trận kề dạng trọng số và tên các đỉnh cho đồ thị ở trên với tên Input.txt
+//lưu trong project.
+//		Dòng đầu tiên chứa số nguyên n(n <= 50) là số đỉnh của đồ thị
+//		n dòng tiếp theo, mỗi dòng chứa n số biểu diễn ma trận kề của các đỉnh
+//		theo thứ tự a, b, c, …k
+//2. Hàm chức năng đọc dữ liệu từ file Input.txt đã tạo.
+//3. Hàm xuất ma trận trọng số ra màn hình.
+//4. Hàm duyệt các đỉnh dựa trên BFS.
+//5. Hàm kiểm tra đồ thị là vô hướng hay có hướng.
+//6. Hàm trả về số bậc của mỗi đỉnh trong đồ thị.
+//7. Hàm tìm số đỉnh và liệt kê các đỉnh nằm trên đường đi từ đỉnh x đến y dựa trên
+//BFS(Tính luôn cả x và y).
+//8. Hàm tìm cây khung nhỏ nhất bằng thuật giải Prim(trả về kết quả tập cạnh và trọng
+//	số).
+//	9. Hàm tìm cây khung nhỏ nhất bằng thuật giải Krukal cổ điển(trả về kết quả tập
+//		cạnh và tổng trọng số nhỏ nhất)
+//	10. Hàm main để kiểm chứng toàn bộ chương trình dưới dạng menu lựa chọn.
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+#include<conio.h>
+#include<fstream>
+#define MAX 50
+using namespace std;
+int n;
+int a[MAX][MAX];
+char C[MAX];// luu cac dinh cua do thi
+bool visited[MAX]={ false };
+
+//tao stack
+struct node
+{
+	int data;
+	node* next;
+};
+node* qu;
+void init_queue()
+{
+	qu = NULL;
+}
+bool isEmpty()
+{
+	if (qu == NULL)
+		return true;
+	return false;
+}
+void push(int value)
+{
+	// Tạo một node mới
+	node* newNode = new node;
+	newNode->data = value;
+	newNode->next = NULL;
+
+	// Nếu queue đang rỗng, thì newNode là phần tử đầu tiên
+	if (isEmpty())
+	{
+		qu = newNode;
+	}
+	else
+	{
+		// Nếu queue không rỗng, thêm newNode vào cuối danh sách
+		node* temp = qu;
+		while (temp->next != NULL)
+		{
+			temp = temp->next;
+		}
+		temp->next = newNode;
+	}
+}
+
+void pop()
+{
+	// Nếu queue rỗng, không có gì để pop
+	if (isEmpty())
+	{
+		std::cout << "Queue is empty. Cannot pop.\n";
+		return;
+	}
+
+	// Lưu giữ node đầu tiên để giữ lại con trỏ đến queue
+	node* temp = qu;
+
+	// Di chuyển con trỏ đến node thứ hai
+	qu = qu->next;
+
+	// Xóa node đầu tiên
+	delete temp;
+}
+void freeMemory()
+{
+	node* p = qu;
+	while (p != NULL)
+	{
+		node* xoa = p;
+		p = p->next;
+		delete xoa;
+	}
+	qu = NULL;
+}
+
+void input_file()
+{
+	ifstream inData;
+	inData.open("Input.txt");
+	if (inData.is_open())
+	{
+		inData >> n;
+		for (int i = 0; i < n; i++)
+			inData >> C[i];
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+				inData >> a[i][j];
+		}
+		inData.close();
+		cout << "Doc file thanh cong" << endl;
+
+	}
+	else
+	{
+		cout << "Doc file bi loi" << endl;
+		return;
+	}
+}
+void output_maTran()
+{
+	cout<< n;
+	cout << endl;
+	for (int i = 0; i < n; i++)
+		cout<< C[i]<<" ";
+	cout << endl;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+			cout<< a[i][j]<<" ";
+		cout << endl;
+	}
+}
+int charToInt(char c)
+{
+	return static_cast<int>(c - 'a');
+}
+void duyet_BFS(int u)
+{
+	init_queue();
+	int v;
+	push(u);
+	visited[u] = true;
+	while (!isEmpty())
+	{
+		v = qu->data;
+		pop();
+		cout << C[v] << " ";
+		for (int i = 0; i < n; i++)
+		{
+			if (a[v][i] != 0 && !visited[i])
+			{
+				push(i);
+				visited[i] = true;
+			}
+		}
+
+	}
+
+}
+
+//kiem tra do thi co huong hay vo huong: vo huong nhu duong 2 chieu, co huong nhu duong 1 chieu
+bool kieTraDoThiVoHuong()
+{
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (a[i][j] = a[j][i])
+				return true;
+		}
+	}
+	return false;
+}
+
+int demSoBac(int x)
+{
+	int dem = 0;
+	for (int i = 0; i < n; i++)
+	{
+		if (a[x][i] != 0)
+			dem++;
+	}
+	return dem;
+}
+
+//prim
+//khai bao tap E
+int E1[MAX];
+int E2[MAX];
+int wE[MAX];
+int nE = 0;
+
+//khai bao tap T
+int T1[MAX];
+int T2[MAX];
+int wT[MAX];//luu trong so
+int nT = 0;
+
+//dua x vao tap T, neu x co ton tai trong tap t
+int TonTai(int d, int D[], int nD)
+{
+	if (nD == 0)
+		return 0;
+	for (int i = 0; i < nD; i++)
+	{
+		if (D[i] == d)
+			return 1;
+
+	}
+	return 0;
+}
+void XoaCanhE(int i)
+{
+	for (int j = i; j < nE - 1; j++)
+	{
+		E1[j] = E1[j + 1];
+		E2[j] = E2[j + 1];
+		wE[j] = wE[j + 1];
+	}
+	nE--;
+}
+
+void Prim(int s)//s la dinh bat dau
+{
+	int u = s, min, i, d1, d2;
+	while (nT < n - 1) //chua du so luong dinh
+	{
+		//chep cac canh ke cua dinh u vao tap E
+		for (int v = 0; v < n; v++)
+		{
+			if (a[u][v] != 0)
+			{
+				//do voi tap T de khong tao chu trinh
+				if (TonTai(v, T2, nT) == 0)
+				{
+					E1[nE] = u;
+					E2[nE] = v;
+					wE[nE] = a[u][v];
+					nE++;
+				}
+			}
+		}
+
+		// chep dinh tu tap E sang T
+		for (i = 0; i < nE; i++)
+		{
+			// do dinh tap E da ton tai trong tap T chua
+			if (TonTai(E2[i], T2, nT) == 0)
+			{
+				min = wE[i];
+				d1 = E1[i]; d2 = E2[i];
+				break; //lay gia tri dau tien duoc gan bang min do voi tung dinh trong tap E de tim trong so nho hon
+
+			}
+
+		}
+		for (; i < nE; i++)
+		{
+			if (TonTai(E2[i], T2, nT) == 0)
+			{
+				if (min > wE[i])
+				{
+					min = wE[i]; d1 = E1[i];
+					d2 = E2[i];
+				}
+			}
+		}
+		//gan gia nho nhat o 1 lan duyet tren vao tap T
+		T1[nT] = d1;
+		T2[nT] = d2;
+		wT[nT] = a[d1][d2];
+		//vì là đồ thị vô hướng nên sẻ gặp trường hợp bị lại nên gán 0 để không duyệt lại nữa
+		a[d1][d2] = 0; a[d2][d1] = 0;
+		nT++;
+		XoaCanhE(d1);
+		XoaCanhE(d2);
+		u = d2;
+
+	}
+}
+
+void output_Prim()
+{
+	int tong = 0;
+	cout << "Ket qua tap canh: " << endl;
+	for (int i = 0; i < nT; i++)
+	{
+		cout << "(" << T1[i] << ", " << T2[i] << ", " << wT[i] << ")" << endl;
+		tong += wT[i];
+	}
+	cout << "tong trong so la: " << tong << endl;
+}
+int main()
+{
+	bool flag = false;
+	int chon;
+	do {
+		system("cls");
+		cout << "1. Doc du lieu tu file Input.txt" << endl;
+		cout << "2. xuat ma tran trong so ra man hinh" << endl;
+		cout << "3. duyet dinh dua tren bfs" << endl;
+		cout << "4. kiem tra do thi co huong hay vo huong" << endl;
+		cout << "5. tra ve so bac cua moi dinh trong do thi" << endl;
+		cout << "6. tim so dinh va liet ke cac dinh nam tren duong di tu dinh x den y (BFS)" << endl;
+		cout << "7. tim cay khung nho nhat bang thuat toan prim, tra ve kq tap canh vaf trong so" << endl;
+		cout << "8. tim cay khung nho nhat bang thuat toan krusal co dien, tra ve kq tap canh va tong trong so" << endl;
+		cout << "0. Thoat" << endl;
+		cout << endl;
+		cout << "NHAP LUA CHON CUA BAN: "; cin >> chon;
+
+		switch (chon)
+		{
+		case 1:
+		{
+			input_file();
+			flag = true;
+			break;
+		}
+		case 2:
+		{
+			if (flag)
+			{
+				cout << "Ma tran trong so: " << endl;
+				output_maTran();
+			}
+			else
+				cout << "Can co du lieu de thuc hien" << endl;
+			break;
+		}
+
+		case 3:
+		{
+			if (flag)
+			{
+				char c;
+				cout << "nhap ki tu bat dau duyet bfs: "; cin >> c;
+				
+				cout << "ket qua sau khi duyet BFS: " << endl;
+				duyet_BFS(charToInt(c));
+			}
+			else
+				cout << "Can co du lieu de thuc hien" << endl;
+			break;
+		}
+		case 4:
+		{
+			if (flag)
+			{
+				if (kieTraDoThiVoHuong() == true)
+					cout << "day la do thi vo huong" << endl;
+				else
+					cout << "Day la do thi co huong" << endl;
+			}
+			else
+				cout << "Can co du lieu de thuc hien" << endl;
+			break;
+		}
+		case 5:
+		{
+			if (flag)
+			{
+				char c;
+				cout << "Nhap dinh muon tim bac: "; cin >> c;
+				cout << "Bac cua dinh " << c << " la " << demSoBac(charToInt(c));
+			}
+			else
+				cout << "Can co du lieu de thuc hien" << endl;
+			break;
+		}
+		case 6:
+		{
+			if (flag)
+			{
+				char c;
+				cout << "Nhap dinh duyet dau tien: ";
+				cin >> c;
+				Prim(charToInt(c));
+				output_Prim();
+			}
+			else
+			{
+				cout << "Can co du lieu de thuc hien" << endl;
+				break;
+			}
+		}
+		case 0:
+		{
+			cout << "ban da thoat khoi chuong trinh" << endl;
+			
+			break;
+			
+		}
+		}_getch();
+
+	} while (chon != 0);
+	freeMemory();
+	
+	system("pause");
+	return 0;
+}
