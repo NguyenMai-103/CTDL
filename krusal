@@ -1,0 +1,146 @@
+#include<iostream>
+#include<fstream>
+#define MAX 100
+using namespace std;
+int a[MAX][MAX];
+int n;
+int C[MAX];//luu cac dinh cua do thi
+//khai bao tap E
+int E1[MAX];
+int E2[MAX];
+int wE[MAX];
+int nE = 0;
+
+// khai bao tap T
+int T1[MAX];
+int T2[MAX];
+int wT[MAX];
+int nT = 0;
+
+bool TonTai(int a[], int size, int x)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (a[i] == x)
+			return true;
+
+	}
+	return false;
+}
+void input_file()
+{
+	ifstream inData;
+	inData.open("input.txt");
+	if (inData.is_open())
+	{
+		inData >> n;
+		for (int i = 0; i < n; i++)
+		{
+			inData >> C[i];
+		}
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+				inData >> a[i][j];
+		}
+		inData.close();
+		cout << "da doc file thanh cong" << endl;
+	}
+	else
+	{
+		cout << "Doc file bi loi" << endl;
+		return;
+	}
+
+}
+void output()
+{
+	cout << n;
+	cout << endl;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+			cout<< a[i][j]<<" ";
+		cout << endl;
+	}
+}
+void krusal()
+{
+	for (int i = 0; i < nE; i++)
+	{
+		if (TonTai(E1[i], T1, nT) && TonTai(E2[i], T2, nT))
+			continue;
+		if (TonTai(E2[i], T1, nT) && TonTai(E1[i], T2, nT))
+			continue;
+		T1[nT] = E1[i];
+		T2[nT] = E2[i];
+		wT[nT] = wE[i];
+		nT++;
+		if (nT = n - 1)
+			break;
+
+	}
+}
+void createE()
+{
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (a[i][j] != 0)
+			{
+				E1[nE] = i;
+				E2[nE] = j;
+				wE[nE] = a[i][j];
+				a[i][j] = 0;
+				a[j][i] = 0;
+				nE++;
+			}
+		}
+	}
+}
+void swap(int &a, int &b)
+{
+	
+		int temp = a;
+		a = b;
+		b = temp;
+	
+	
+}
+void sortE() {
+	for (int i = 0; i < nE - 1; i++)
+	{
+		for (int j = i + 1; j < nE; j++)
+		{
+			if (wE[i] > wE[j])
+			{
+				swap(wE[i], wE[j]);
+				swap(E1[i], E1[j]);
+				swap(E2[i], E2[j]);
+			}
+		}
+	}
+}
+void outputE()
+{
+	for (int i = 0; i < nE; i++)
+	{
+		cout << "(" << C[E1[i]] << "," << C[E2[i]] << "," << wE[i] << endl;
+	}
+}
+int main()
+{
+	input_file();
+	output();
+	cout << "tap E ban dau" << endl;
+	createE();
+	outputE();
+	cout << endl;
+	cout << "Tap E sau khi sort" << endl;
+	sortE();
+	outputE();
+	
+	system("pause");
+	return 0;
+}
